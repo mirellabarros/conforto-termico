@@ -11,14 +11,14 @@ import mysql.connector
 from mysql.connector import Error
 
 # Informações do Servidor MQTT
-servidor_mqtt = '192.168.50.58'
+servidor_mqtt = '10.0.0.50'
 porta_mqtt = 1883
 usuario_mqtt = 'admin'
 senha_mqtt = 'paulvandyk11'
 id_mqtt = f'python-mqtt-{random.randint(0, 1000)}'
 
 # Informações do Servidor MySql
-servidor_mysql = '192.168.50.58'
+servidor_mysql = '10.0.0.50'
 usuario_mysql = 'root'
 senha_mysql = 'paulvandyk11'
 banco_de_dados = 'confterm'

@@ -9,7 +9,7 @@ from mysql.connector import Error
 import pandas as pd
 
 # Informações do Servidor MySql
-servidor_mysql = '192.168.50.58'
+servidor_mysql = '10.0.0.50'
 usuario_mysql = 'root'
 senha_mysql = 'paulvandyk11'
 banco_de_dados = 'confterm'

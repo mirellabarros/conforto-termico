@@ -20,11 +20,11 @@ led_wifi = machine.Pin(5, machine.Pin.OUT, value=0)
 led_sensor = machine.Pin(18, machine.Pin.OUT, value=0)
 
 # Informações da Rede Wi-FI
-ssid = 'MirellaLarissa_24Ghz'
-password = 'morumtri2020'
+ssid = 'Conforto-Termico'
+password = 'master1466'
 
 # Informações do Servidor MQTT
-mqtt_server = '192.168.50.58'
+mqtt_server = '10.0.0.50'
 mqtt_user = 'admin'
 mqtt_password = 'paulvandyk11'
 client_id = ubinascii.hexlify(machine.unique_id())
@@ -69,9 +69,9 @@ def read_sensor():
       pisca_led()
       return temp, hum
     else:
-      return('Leituras de sensor inválidas.')
+      print('Leituras de sensor inválidas.')
   except OSError as e:
-    return('Falha ao ler o sensor.')
+    print('Falha ao ler o sensor.')
         
 def connect_and_subscribe():
     global client_id, mqtt_server, topic_sub

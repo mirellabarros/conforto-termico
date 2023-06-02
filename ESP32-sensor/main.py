@@ -31,10 +31,10 @@ client_id = ubinascii.hexlify(machine.unique_id())
 
 # Tópicos
 topic_sub = 'esp/ac/status'
-topic_pub_sensor1 = 'esp/dht/3'
+topic_pub_sensor = 'esp/dht/1'
 
 # Parâmetros de tempo
-last_sensor_reading = 0 
+last_sensor_reading = time.time() - 30
 readings_interval = 30 # intervalo de leitura do sensor
 
 # Conexão à rede wi-fi
@@ -97,7 +97,7 @@ while True:
         if (time.time() - last_sensor_reading) > readings_interval:            
             temp, hum = read_sensor()
             dados = temp + ";" + hum
-            client.publish(topic_pub_sensor1, dados)
+            client.publish(topic_pub_sensor, dados)
             print(f"Temperatura: {temp} | Umidade: {hum}")
             last_sensor_reading = time.time()
     except OSError as e:

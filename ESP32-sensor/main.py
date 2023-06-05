@@ -3,10 +3,10 @@
 # Teste de Cliente MQTT com ESP32 e DHT22
 # ***************************************
 
-import time
+from time import sleep, time
 from umqttsimple import MQTTClient
 import ubinascii
-import machine
+from machine import Pin, SoftI2C, reset, unique_id
 import micropython
 import network
 import esp
@@ -14,10 +14,21 @@ import dht
 esp.osdebug(None)
 import gc
 gc.collect()
+from ADS1115 import *
 
-sensor = dht.DHT22(machine.Pin(4))
-led_wifi = machine.Pin(5, machine.Pin.OUT, value=0)
-led_sensor = machine.Pin(18, machine.Pin.OUT, value=0)
+sensor = dht.DHT22(Pin(4))
+led_wifi = Pin(5, Pin.OUT, value=0)
+led_sensor = Pin(18, Pin.OUT, value=0)
+
+# ADS1115
+ADS1115_ADDRESS = 0x49
+
+i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=40000)
+adc = ADS1115(ADS1115_ADDRESS, i2c=i2c)
+
+adc.setVoltageRange_mV(ADS1115_RANGE_4096)
+adc.setCompareChannels(ADS1115_COMP_0_GND)
+adc.setMeasureMode(ADS1115_SINGLE)
 
 # Informações da Rede Wi-FI
 ssid = 'Conforto-Termico'
@@ -27,14 +38,14 @@ password = 'master1466'
 mqtt_server = '10.0.0.50'
 mqtt_user = 'admin'
 mqtt_password = 'paulvandyk11'
-client_id = ubinascii.hexlify(machine.unique_id())
+client_id = ubinascii.hexlify(unique_id())
 
 # Tópicos
 topic_sub = 'esp/ac/status'
-topic_pub_sensor = 'esp/dht/1'
+topic_pub_sensor = 'esp/dht/2'
 
 # Parâmetros de tempo
-last_sensor_reading = time.time() - 30
+last_sensor_reading = time() - 30
 readings_interval = 30 # intervalo de leitura do sensor
 
 # Conexão à rede wi-fi
@@ -50,11 +61,20 @@ print('Conexão realizada com sucesso!')
 print(station.ifconfig())
 
 
+def readChannel(channel):
+    adc.setCompareChannels(channel)
+    adc.startSingleMeasurement()
+    while adc.isBusy():
+        pass
+    voltage = adc.getResult_V()
+    return voltage
+
+
 def pisca_led():
-    agora = time.time()
-    while time.time() < agora + 2:
+    agora = time()
+    while time() < agora + 2:
         led_sensor.value(not led_sensor.value())
-        time.sleep(.1)
+        sleep(.1)
     led_sensor.value(0)
 
 
@@ -72,19 +92,22 @@ def read_sensor():
       print('Leituras de sensor inválidas.')
   except OSError as e:
     print('Falha ao ler o sensor.')
-        
+
+
 def connect_and_subscribe():
     global client_id, mqtt_server, topic_sub
     client = MQTTClient(client_id, mqtt_server, user=mqtt_user, password=mqtt_password)
     client.connect()
     print(f'Conectado ao servidor {mqtt_server} MQTT broker')
     return client
-    
+
+
 def restart_and_reconnect():
     print('Falha ao se conectrar ao MQTT broker. Reconectando...')
-    time.sleep(20)
-    machine.reset()
-    
+    sleep(20)
+    reset()
+
+
 try:
     client = connect_and_subscribe()
 except OSError as e:
@@ -94,13 +117,16 @@ while True:
     try:
         client.check_msg()
         
-        if (time.time() - last_sensor_reading) > readings_interval:            
+        if (time() - last_sensor_reading) > readings_interval:            
             temp, hum = read_sensor()
-            dados = temp + ";" + hum
+            kimo = readChannel(ADS1115_COMP_3_GND)
+            kimo = ("{:<4.2f}".format(kimo))
+            dados = temp + ";" + hum + ";" + kimo
             client.publish(topic_pub_sensor, dados)
-            print(f"Temperatura: {temp} | Umidade: {hum}")
-            last_sensor_reading = time.time()
+            print(f"Temperatura: {temp} | Umidade: {hum} | Vento: {kimo}")
+            
+            last_sensor_reading = time()
+            
     except OSError as e:
         restart_and_reconnect()
         led_wifi.value(0)
-

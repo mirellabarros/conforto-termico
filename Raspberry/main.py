@@ -42,7 +42,7 @@ topic_sub_objetivo = 'rasp/config/objetivo'
 tdb = 0
 tr = 0
 rh = 0
-v = 0.1
+v = 0
 met = 0
 clo = 0
 
@@ -165,7 +165,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(f'Informação `{msg.payload.decode()}` recebida de `{msg.topic}`')
 
-    global met, clo, cfg_objetivo, tdb, tr, rh, total_pmv, media_pmv, media_pmv, id_conjunto_leitura, \
+    global met, clo, cfg_objetivo, tdb, tr, rh, v, total_pmv, media_pmv, media_pmv, id_conjunto_leitura, \
         qtd_leituras, qtd_leituras_restantes
 
     if topic_sub_met in msg.topic:
@@ -182,11 +182,12 @@ def on_message(client, userdata, msg):
         if 'esp/dht' in msg.topic:
 
             dados_sensor = msg.payload.decode()
-            temp, hum = dados_sensor.split(";")
+            temp, hum, vel = dados_sensor.split(";")
 
             tdb = round(float(temp), 2)
             tr = round(float(temp), 2)
             rh = round(float(hum), 2)
+            v = round(float(vel), 2)
 
             topico = msg.topic.split("/")
             id_sensor = topico[2]

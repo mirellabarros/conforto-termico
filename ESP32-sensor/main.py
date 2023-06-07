@@ -42,7 +42,7 @@ client_id = ubinascii.hexlify(unique_id())
 
 # Tópicos
 topic_sub = 'esp/ac/status'
-topic_pub_sensor = 'esp/dht/2'
+topic_pub_sensor = 'esp/dht/1'
 
 # Parâmetros de tempo
 last_sensor_reading = time() - 30

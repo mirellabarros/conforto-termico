@@ -21,7 +21,7 @@ led_wifi = Pin(5, Pin.OUT, value=0)
 # led_ac = Pin(13, Pin.OUT, value=0)
 led_sensor = Pin(12, Pin.OUT, value=0)
 
-rele_ac = Pin(13, Pin.OUT, value=0)
+rele_ac = Pin(13, Pin.OUT, value=1)
 rele_ventilador = Pin(14, Pin.OUT, value=1)
 
 # ADS1115
@@ -107,11 +107,11 @@ def sub_cb(topic, msg):
         global last_ac_start
         if (time() - last_ac_start) > ac_interval:
             if msg == b'1':
-                rele_ac.value(1)
+                rele_ac.value(0)
                 print("Ar-condicionado ligado.")
                 last_ac_start = time()
             elif msg == b'0':
-                rele_ac.value(0)
+                rele_ac.value(1)
                 last_ac_start = time()
             
             

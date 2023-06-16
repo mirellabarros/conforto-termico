@@ -46,6 +46,9 @@ v = 0
 met = 0
 clo = 0
 
+# Variáveis de velocidade de vento fixas
+arr_vento = [0, 0, 0, 0]
+
 # Variáveis de controle
 arr_pmv = [0, 0, 0, 0]
 
@@ -56,6 +59,40 @@ cfg_objetivo = 0
 def opcoes_de_sistema():
     print("Deseja utilizar o ventilador?")
     ventilador = int(input("1: Sim | 0: Não: "))
+
+    print("-----------------------------------------------------")
+
+    print("Deseja utilizar valores fixos de vento para o Sensor 0?")
+    fixar_vento_s0 = int(input("1: Sim | 0: Não: "))
+
+    if fixar_vento_s0:
+        arr_vento[0] = float(input("Valor do vento no Sensor 0: "))
+
+    print("-----------------------------------------------------")
+
+    print("Deseja utilizar valores fixos de vento para o Sensor 1?")
+    fixar_vento_s1 = int(input("1: Sim | 0: Não: "))
+
+    if fixar_vento_s1:
+        arr_vento[1] = float(input("Valor do vento no Sensor 1: "))
+
+    print("-----------------------------------------------------")
+
+    print("Deseja utilizar valores fixos de vento para o Sensor 2?")
+    fixar_vento_s2 = int(input("1: Sim | 0: Não: "))
+
+    if fixar_vento_s2:
+        arr_vento[2] = float(input("Valor do vento no Sensor 2: "))
+
+    print("-----------------------------------------------------")
+
+    print("Deseja utilizar valores fixos de vento para o Sensor 3?")
+    fixar_vento_s3 = int(input("1: Sim | 0: Não: "))
+
+    if fixar_vento_s3:
+        arr_vento[3] = float(input("Valor do vento no Sensor 3: "))
+
+    print("-----------------------------------------------------")
 
     print("Deseja armazenar as informações no banco de dados?")
     armazenar_dados = int(input("1: Sim | 0: Não: "))
@@ -101,7 +138,7 @@ def calcula_pmv():
     v_r = v_relative(v=v, met=met)
     # calculate dynamic clothing
     clo_d = clo_dynamic(clo=clo, met=met)
-    results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, standard="ASHRAE", units="SI")
+    results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, units="SI")
     return results['pmv']
 
 
@@ -184,15 +221,19 @@ def on_message(client, userdata, msg):
             dados_sensor = msg.payload.decode()
             temp, hum, vel = dados_sensor.split(";")
 
-            tdb = round(float(temp), 2)
-            tr = round(float(temp), 2)
-            rh = round(float(hum), 2)
-            v = round(float(vel), 2)
-
             topico = msg.topic.split("/")
             id_sensor = topico[2]
             arr_pmv[int(id_sensor)] = calcula_pmv()
             topic_pub_esp_pmv = 'esp/pmv/' + id_sensor
+
+            if arr_vento[int(id_sensor)]:
+                v = arr_vento[int(id_sensor)]
+            else:
+                v = round(float(vel), 2)
+
+            tdb = round(float(temp), 2)
+            tr = round(float(temp), 2)
+            rh = round(float(hum), 2)
 
             # Reinicia a variável para calcular novamente o PMV médio na próxima passagem
             total_pmv = 0

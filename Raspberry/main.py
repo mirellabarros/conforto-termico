@@ -138,7 +138,7 @@ def calcula_pmv():
     v_r = v_relative(v=v, met=met)
     # calculate dynamic clothing
     clo_d = clo_dynamic(clo=clo, met=met)
-    results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, units="SI")
+    results = pmv_ppd(tdb=tdb, tr=tr, vr=v_r, rh=rh, met=met, clo=clo_d, standard='ASHRAE')
     return results['pmv']
 
 
@@ -223,8 +223,6 @@ def on_message(client, userdata, msg):
 
             topico = msg.topic.split("/")
             id_sensor = topico[2]
-            arr_pmv[int(id_sensor)] = calcula_pmv()
-            topic_pub_esp_pmv = 'esp/pmv/' + id_sensor
 
             if arr_vento[int(id_sensor)]:
                 v = arr_vento[int(id_sensor)]
@@ -234,6 +232,9 @@ def on_message(client, userdata, msg):
             tdb = round(float(temp), 2)
             tr = round(float(temp), 2)
             rh = round(float(hum), 2)
+
+            arr_pmv[int(id_sensor)] = calcula_pmv()
+            topic_pub_esp_pmv = 'esp/pmv/' + id_sensor
 
             # Reinicia a variável para calcular novamente o PMV médio na próxima passagem
             total_pmv = 0

@@ -151,7 +151,7 @@ def eq_regressao_logistica():
 
     # Resultado do tipo float
     # Ligar o ar-condicionado caso o valor seja maior que 0.4
-    return 1 if probabilidade > 0.4 else 0
+    return 1 if probabilidade > 0.1 else 0
 
 
 def ml_regressao_logistica():
@@ -270,7 +270,7 @@ def on_message(client, userdata, msg):
 
                     query = f"INSERT INTO pmvsensor (idpmvdesc, sensor, pmv, tdb, tr, rh, vel, met, clo, ac, " \
                             f"equacao, ml) VALUES ({id_conjunto_leitura}, {id_sensor}, {arr_pmv[int(id_sensor)]}, " \
-                            f"{tdb}, {tr}, {rh}, {vel}, {met}, {clo}, {status_ar_condicionado}, " \
+                            f"{tdb}, {tr}, {rh}, {v}, {met}, {clo}, {status_ar_condicionado}, " \
                             f"{arr_eq[int(id_sensor)]}, {arr_ml[int(id_sensor)]})"
                     conexao = conexao_banco_de_dados(servidor_mysql, usuario_mysql, senha_mysql, banco_de_dados)
                     executa_query(conexao, query)
@@ -282,15 +282,15 @@ def on_message(client, userdata, msg):
                 elif qtd_leituras == 0:
                     query = f"INSERT INTO pmvsensor (idpmvdesc, sensor, pmv, tdb, tr, rh, vel, met, clo, ac, " \
                             f"equacao, ml) VALUES ({id_conjunto_leitura}, {id_sensor}, {arr_pmv[int(id_sensor)]}, " \
-                            f"{tdb}, {tr}, {rh}, {vel}, {met}, {clo}, {status_ar_condicionado}, " \
+                            f"{tdb}, {tr}, {rh}, {v}, {met}, {clo}, {status_ar_condicionado}, " \
                             f"{arr_eq[int(id_sensor)]}, {arr_ml[int(id_sensor)]})"
                     conexao = conexao_banco_de_dados(servidor_mysql, usuario_mysql, senha_mysql, banco_de_dados)
                     executa_query(conexao, query)
                     conexao.close()
 
             for i in range(qtd_sensores):
-                print("PMV no Sensor {0:1d}: {1:3.2f} - Equação: {0:1d} - ML: {0:1d}".format(i, arr_pmv[i],
-                                                                                             arr_eq[i], arr_ml[i]))
+                print("PMV no Sensor {0:1d}: {1:3.2f} - Equação: {2:1d} - "
+                      "ML: {3:1d}".format(i, arr_pmv[i], int(arr_eq[i]), int(arr_ml[i])))
 
             print("PMV médio atual: {0:3.2f}".format(media_pmv))
             print("PMV alvo: {0:3.2f}".format(0.5 + cfg_objetivo))

@@ -57,12 +57,12 @@ print("Accuracy score: ", accuracy_score(Y_test, predictions))
 ###################################################################################################
 # Variáveis para determinar se vai ligar o AC
 
-tdb1 = 23.3
+tdb1 = 26.1
 tr1 = tdb1
-v1 = 0.07
-rh1 = 54.2
-met1 = 2.7
-clo1 = 0.74
+v1 = 0.1
+rh1 = 65
+met1 = 1.2
+clo1 = 0.57
 vr1 = v1 + 0.3*(met1 - 1)
 clo_d1 = clo1*(0.6 + 0.4/met1)
 
